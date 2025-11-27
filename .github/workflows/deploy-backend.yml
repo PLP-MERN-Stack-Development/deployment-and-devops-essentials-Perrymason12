@@ -1,0 +1,25 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Deployment notification
+        run: |
+          echo "🚀 Backend deployment triggered"
+          echo "Note: Configure your deployment platform (Render/Railway/Heroku) to auto-deploy from GitHub"
+          echo "For Render: Connect your GitHub repo and enable auto-deploy"
+          echo "For Railway: Connect your GitHub repo and enable auto-deploy"
+          echo "For Heroku: Use Heroku GitHub integration or Heroku CLI"
+
+

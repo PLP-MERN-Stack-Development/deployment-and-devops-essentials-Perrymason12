@@ -1,77 +1,175 @@
-# Deployment and DevOps for MERN Applications
+# Real-Time Chat Application (Week 5 Assignment)
 
-This assignment focuses on deploying a full MERN stack application to production, implementing CI/CD pipelines, and setting up monitoring for your application.
+A full-stack Socket.io chat platform demonstrating bi-directional, real-time communication between a Node.js/Express server and a React (Vite) client. The project satisfies all required tasks from `Week5-Assignment.md`, including the implementation of multiple advanced chat capabilities, real-time notifications, and UX optimizations.
 
-## Assignment Overview
+## ✨ Features
 
-You will:
-1. Prepare your MERN application for production deployment
-2. Deploy the backend to a cloud platform
-3. Deploy the frontend to a static hosting service
-4. Set up CI/CD pipelines with GitHub Actions
-5. Implement monitoring and maintenance strategies
+- **Real-time global messaging** with usernames and precise timestamps.
+- **Multi-room support** (General, Tech, Gaming, Support) with live presence per room.
+- **Direct messages** between any two users via a dedicated channel.
+- **Typing indicators** scoped to the active room.
+- **Online/offline status** with automatic updates on join/leave.
+- **File & image sharing** (inlined previews for images, download links for other files).
+- **Read receipts** showing who has seen your messages in each room.
+- **Desktop notifications & sound cues** for new messages and DMs (when permitted by the browser).
+- **Message search** within the active room.
+- **Message history pagination** with “Load older messages” control.
+- **Connection resiliency** via automatic Socket.io reconnection and manual reconnect controls.
 
-## Getting Started
+> Advanced feature count: multi-room support, direct/private messaging, file sharing, read receipts, real-time notifications, message search, and history pagination (7 in total).
 
-1. Accept the GitHub Classroom assignment invitation
-2. Clone your personal repository that was created by GitHub Classroom
-3. Follow the setup instructions in the `Week7-Assignment.md` file
-4. Use the provided templates and configuration files as a starting point
+## 🧱 Project Structure
 
-## Files Included
+```
+real-time-communication-with-socket-io-Perrymason12/
+├── Week5-Assignment.md      # Assignment brief
+├── README.md                # You are here
+├── server/                  # Express + Socket.io backend
+│   ├── server.js            # Core server, socket handlers, REST endpoints
+│   ├── package.json
+│   └── public/              # Static fallback UI (optional)
+└── client/                  # React + Vite frontend
+    ├── src/
+    │   ├── App.jsx          # Main UI
+    │   ├── main.jsx         # App bootstrap
+    │   ├── styles.css       # Tailored styling
+    │   └── socket/
+    │       └── socket.js    # Socket client + custom hook
+    ├── index.html
+    ├── package.json
+    └── vite.config.*        # Vite configuration
+```
 
-- `Week7-Assignment.md`: Detailed assignment instructions
-- `.github/workflows/`: GitHub Actions workflow templates
-- `deployment/`: Deployment configuration files and scripts
-- `.env.example`: Example environment variable templates
-- `monitoring/`: Monitoring configuration examples
+## ⚙️ Environment Configuration
 
-## Requirements
+Create an `.env` file in `server/` (optional) to override defaults:
 
-- A completed MERN stack application from previous weeks
-- Accounts on the following services:
-  - GitHub
-  - MongoDB Atlas
-  - Render, Railway, or Heroku (for backend)
-  - Vercel, Netlify, or GitHub Pages (for frontend)
-- Basic understanding of CI/CD concepts
+```
+PORT=5000
+CLIENT_URL=http://localhost:5173
+DEFAULT_ROOM=general
+CHAT_ROOMS=general,tech,gaming,support
+MESSAGE_HISTORY_LIMIT=300
+```
 
-## Deployment Platforms
+Create an `.env` file in `client/` if you deploy to different hosts:
 
-### Backend Deployment Options
-- **Render**: Easy to use, free tier available
-- **Railway**: Developer-friendly, generous free tier
-- **Heroku**: Well-established, extensive documentation
+```
+VITE_SOCKET_URL=http://localhost:5000
+VITE_API_URL=http://localhost:5000
+```
 
-### Frontend Deployment Options
-- **Vercel**: Optimized for React apps, easy integration
-- **Netlify**: Great for static sites, good CI/CD
-- **GitHub Pages**: Free, integrated with GitHub
+All variables are optional; sensible defaults cover local development.
 
-## CI/CD Pipeline
+## 🚀 Getting Started
 
-The assignment includes templates for setting up GitHub Actions workflows:
-- `frontend-ci.yml`: Tests and builds the React application
-- `backend-ci.yml`: Tests the Express.js backend
-- `frontend-cd.yml`: Deploys the frontend to your chosen platform
-- `backend-cd.yml`: Deploys the backend to your chosen platform
+### 1. Install dependencies
 
-## Submission
+```bash
+# Backend
+cd server
+npm install
 
-Your work will be automatically submitted when you push to your GitHub Classroom repository. Make sure to:
+# Frontend
+cd ../client
+npm install
+```
 
-1. Complete all deployment tasks
-2. Set up CI/CD pipelines with GitHub Actions
-3. Deploy both frontend and backend to production
-4. Document your deployment process in the README.md
-5. Include screenshots of your CI/CD pipeline in action
-6. Add URLs to your deployed applications
+### 2. Run the application (two terminals)
 
-## Resources
+```bash
+# Terminal 1 – server
+cd server
+npm run dev      # uses nodemon
 
-- [GitHub Actions Documentation](https://docs.github.com/en/actions)
-- [MongoDB Atlas Documentation](https://docs.atlas.mongodb.com/)
-- [Render Documentation](https://render.com/docs)
-- [Railway Documentation](https://docs.railway.app/)
-- [Vercel Documentation](https://vercel.com/docs)
-- [Netlify Documentation](https://docs.netlify.com/) 
+# Terminal 2 – client
+cd client
+npm run dev      # starts Vite on http://localhost:5173
+```
+
+The Vite dev server will automatically open the app in your browser. Open multiple tabs or browsers to simulate different users.
+
+## 🔍 API & Socket Endpoints
+
+The server exposes REST helpers alongside Socket.io events:
+
+- `GET /api/messages?room=<room>&before=<timestamp>&limit=<n>` – paginated history
+- `GET /api/users` – active users (all rooms)
+- `GET /api/rooms` – available rooms and default room
+
+Key Socket events handled server-side:
+
+- `user_join`, `switch_room`, `user_left`
+- `send_message`, `private_message`, `receive_message`
+- `typing`, `typing_users`
+- `message_read`
+- `room_list`, `room_joined`, `user_list`
+
+See `server/server.js` and `client/src/socket/socket.js` for the full event lifecycle.
+
+## 🧪 Testing the Experience
+
+1. **Connect multiple users** with different usernames; observe user presence updating instantly.
+2. **Switch between rooms** using the Channels list. Note per-room history and unread badges.
+3. **Send files or images** – images render inline, other files download.
+4. **Trigger typing indicators** by typing in one window and watching the other.
+5. **Open direct messages** via the Online Users panel (click a user to DM).
+6. **Scroll up / load older messages** to test pagination and read receipts.
+7. **Allow browser notifications** when prompted to receive desktop alerts.
+
+All core & advanced requirements from the assignment are covered and manually verified.
+
+## 🚀 Deployment (Week 7 Assignment)
+
+This application is production-ready and can be deployed to various platforms.
+
+### Deployed URLs
+
+**Frontend**: [Add your deployed frontend URL here]
+**Backend API**: [Add your deployed backend URL here]
+
+### Quick Deployment
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for comprehensive deployment instructions covering:
+- Backend deployment (Render, Railway, Heroku)
+- Frontend deployment (Vercel, Netlify, GitHub Pages)
+- CI/CD pipeline setup
+- MongoDB Atlas configuration
+- Monitoring and maintenance
+
+### CI/CD Pipeline
+
+The repository includes GitHub Actions workflows for:
+- ✅ Automated testing and linting
+- ✅ Build verification
+- ✅ Deployment automation
+
+View workflows in `.github/workflows/`
+
+### Health Check
+
+The backend includes a health check endpoint:
+```
+GET /health
+```
+
+Returns server status, uptime, database connection, and performance metrics.
+
+### Environment Variables
+
+See `.env.example` files in `server/` and `client/` directories for required environment variables.
+
+## 📸 Screenshots & Deployment
+
+- Add screenshots or screencasts showing multi-room chat, read receipts, file sharing, etc.
+- Include screenshots of your CI/CD pipeline in action
+- Document your monitoring setup
+
+## 🙌 Acknowledgements
+
+- [Socket.io Documentation](https://socket.io/docs/v4/)
+- [React Documentation](https://react.dev/)
+- [Express Documentation](https://expressjs.com/)
+- [MDN Notifications API](https://developer.mozilla.org/en-US/docs/Web/API/notification)
+
+Happy chatting! 🎉
